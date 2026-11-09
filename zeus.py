@@ -446,11 +446,12 @@ def _dx_state(value: str) -> str:
 
 def _timezone_state() -> str:
     """`stateField`: Zeitzone des Clients. Relevant für Buchungen."""
+    # Je Eintrag `Name|Typ|Laenge|Wert` -- falsche Laenge gibt HTTP 500.
     now = time.localtime()
     dst = now.tm_isdst > 0
-    minutes = -(time.altzone if dst else time.timezone) // 60
-    suffix = "DST" if dst else ""
-    return f'{{"data":"12|#|Offset|2|3|{minutes}{suffix}|8|1|1#"}}'
+    offset = str(-(time.altzone if dst else time.timezone) // 60)
+    return (f'{{"data":"12|#|Offset|2|{len(offset)}|{offset}'
+            f'DST|8|1|{int(dst)}#"}}')
 
 # --- Kommandozeile ---
 
